@@ -60,20 +60,32 @@ def nfa_to_dfa(nfa_states, alphabet, nfa_transitions, nfa_start_state, nfa_accep
     return dfa_states, dfa_transitions, dfa_start_state, dfa_accept_states
 
 def display_transition_table(transition_table, alphabet):
-    df = pd.DataFrame(columns=['State'] + alphabet)
+    st.subheader("DFA Transition table")
+    df = pd.DataFrame(columns=['State'] + alphabet)  # Initialize an empty DataFrame
     for state, transitions in transition_table.items():
         row = [", ".join(sorted(state))]
         for symbol in alphabet:
             next_state = transitions.get(symbol, frozenset())
             row.append(", ".join(sorted(next_state)))
-        df.loc[len(df)] = row
-    
-    # Remove empty rows
-    df = df.dropna(how='all')
-    
-    return df
+        df.loc[len(df)] = row  # Add each row to the DataFrame
+    st.dataframe(df,width=800)  # Display the DataFrame
 
-def main():
+
+
+
+def about_page():
+    st.write("# About")
+    st.write("This Streamlit application converts a Non-Deterministic Finite Automaton (NFA) into a Deterministic Finite Automaton (DFA) using the provided transition table.")
+    st.write("## How it Works")
+    st.write("1. **Input**: Enter the states, alphabet, start state, and accept states of the NFA. Provide the NFA transition table by specifying each transition in the format `state, symbol, next_states`.")
+    st.write("2. **Conversion**: Click the 'Convert to DFA' button. The application converts the NFA transition table into a DFA transition table.")
+    st.write("3. **Output**: The resulting DFA transition table is displayed, showing the transitions for each state and symbol.")
+    st.write("## Meet the Team")
+    st.write("| Name          | Email                 | Role              |")
+    st.write("|---------------|-----------------------|-------------------|")
+
+
+def conversion_page():
     set_theme()
     st.title("NFA to DFA Converter")
 
@@ -98,8 +110,19 @@ def main():
         dfa_states, dfa_transitions, dfa_start_state, dfa_accept_states = nfa_to_dfa(nfa_states, alphabet, nfa_transitions, nfa_start_state, nfa_accept_states)
         transition_table = display_transition_table(dfa_transitions, alphabet)
 
-        st.subheader("DFA Transition Table:")
-        st.dataframe(transition_table, width=800, height=None)
+
+
+def main():
+    set_theme()
+
+    pages = {
+        "About": about_page,
+        "Conversion":conversion_page
+    }
+
+    selection = st.sidebar.radio("Go to", list(pages.keys()))
+    pages[selection]()
 
 if __name__ == "__main__":
     main()
+
