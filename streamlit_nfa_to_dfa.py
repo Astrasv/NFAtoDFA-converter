@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 
-# Set Streamlit theme
 def set_theme():
     st.markdown(
         """
@@ -13,6 +12,14 @@ def set_theme():
             .stButton>button {
                 color: white;
                 background-color: #1976D2; /* Blue button */
+                transition: 200ms ease;
+            }
+            .stButton>button:hover {
+                color:white                
+                background-color: #2976D2; /* Blue button */
+                box-shadow: 0 0 30px 5px #0ef;
+
+                
             }
             .css-1aumxhk {
                 color: white;
@@ -61,28 +68,35 @@ def nfa_to_dfa(nfa_states, alphabet, nfa_transitions, nfa_start_state, nfa_accep
 
 def display_transition_table(transition_table, alphabet):
     st.subheader("DFA Transition table")
-    df = pd.DataFrame(columns=['State'] + alphabet)  # Initialize an empty DataFrame
+    df = pd.DataFrame(columns=['State'] + alphabet)  
     for state, transitions in transition_table.items():
         row = [", ".join(sorted(state))]
         for symbol in alphabet:
             next_state = transitions.get(symbol, frozenset())
             row.append(", ".join(sorted(next_state)))
-        df.loc[len(df)] = row  # Add each row to the DataFrame
-    st.dataframe(df,width=800)  # Display the DataFrame
-
+        df.loc[len(df)] = row  
+    st.dataframe(df,width=800) 
 
 
 
 def about_page():
     st.write("# About")
     st.write("This Streamlit application converts a Non-Deterministic Finite Automaton (NFA) into a Deterministic Finite Automaton (DFA) using the provided transition table.")
+    st.button("[Go to Conversion Page](?page=conversion_page)")
     st.write("## How it Works")
     st.write("1. **Input**: Enter the states, alphabet, start state, and accept states of the NFA. Provide the NFA transition table by specifying each transition in the format `state, symbol, next_states`.")
     st.write("2. **Conversion**: Click the 'Convert to DFA' button. The application converts the NFA transition table into a DFA transition table.")
     st.write("3. **Output**: The resulting DFA transition table is displayed, showing the transitions for each state and symbol.")
     st.write("## Meet the Team")
-    st.write("| Name          | Email                 | Role              |")
-    st.write("|---------------|-----------------------|-------------------|")
+    team_data = {
+        "Name": ["Sudharsan Vanamali", "Ritesh Koushik", "Guda Sravanthi ","M.Nishanth Sai","Chennuru Sri Lahari "],
+        "Role": ["CB.EN.U4CSE22049", "CB.EN.U4CSE22038", "CB.EN.U4CSE22014","CB.EN.U4CSE22028","CB.EN.U4CSE22008"]
+    }
+    team_df = pd.DataFrame(team_data)
+    team_df_display = team_df.copy()  
+    team_df_display.index = team_df_display.index+1
+    st.dataframe(team_df_display,width=800)  
+
 
 
 def conversion_page():
@@ -120,7 +134,7 @@ def main():
         "Conversion":conversion_page
     }
 
-    selection = st.sidebar.radio("Go to", list(pages.keys()))
+    selection = st.sidebar.radio("Navigate to", list(pages.keys()), index=1)
     pages[selection]()
 
 if __name__ == "__main__":
