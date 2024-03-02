@@ -50,6 +50,8 @@ The application provides a user interface for entering the NFA transition table 
 
 Once the input is provided, click the "Convert to DFA" button. The application will convert the NFA transition table into a DFA transition table and display it in a DataFrame format.
 
+![alt text](image.png)
+
 ### Run the Application
 
 To run the application, execute the following command in your terminal:
