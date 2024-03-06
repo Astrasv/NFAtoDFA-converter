@@ -63,8 +63,16 @@ def nfa_to_dfa(nfa_states, alphabet, nfa_transitions, nfa_start_state, nfa_accep
                 if epsilon_closure_states not in dfa_states:
                     dfa_states.add(epsilon_closure_states)
                     stack.append(epsilon_closure_states)
+        # Handling empty string transitions
+        epsilon_states = epsilon_closure(current_state, nfa_transitions)
+        if epsilon_states:
+            dfa_transitions.setdefault(current_state, {}).setdefault('λ', set()).update(epsilon_states)
+            if epsilon_states not in dfa_states:
+                dfa_states.add(epsilon_states)
+                stack.append(epsilon_states)
     dfa_accept_states = {state for state in dfa_states if state.intersection(nfa_accept_states)}
     return dfa_states, dfa_transitions, dfa_start_state, dfa_accept_states
+
 
 def display_transition_table(transition_table, alphabet):
     st.subheader("DFA Transition table")
@@ -73,9 +81,13 @@ def display_transition_table(transition_table, alphabet):
         row = [", ".join(sorted(state))]
         for symbol in alphabet:
             next_state = transitions.get(symbol, frozenset())
-            row.append(", ".join(sorted(next_state)))
-        df.loc[len(df)] = row  
-    st.dataframe(df,width=800) 
+            if next_state:
+                row.append(", ".join(sorted(next_state)))
+            else:
+                row.append("φ")  
+        df.loc[len(df)] = row
+    st.dataframe(df, width=800)
+
 
 
 
@@ -96,8 +108,6 @@ def about_page():
     team_df_display = team_df.copy()  
     team_df_display.index = team_df_display.index+1
     st.dataframe(team_df_display,width=800)  
-
-
 
 def conversion_page():
     set_theme()
