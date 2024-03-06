@@ -90,7 +90,6 @@ def display_transition_table(transition_table, alphabet):
 
 
 
-
 def about_page():
     st.write("# About")
     st.write("This Streamlit application converts a Non-Deterministic Finite Automaton (NFA) into a Deterministic Finite Automaton (DFA) using the provided transition table.")
@@ -118,7 +117,7 @@ def conversion_page():
     alphabet_input = st.text_input("Alphabet (comma-separated)", "")
     nfa_start_state_input = st.text_input("Start State", "")
     nfa_accept_states_input = st.text_input("Accept States (comma-separated)", "")
-    nfa_transitions_input = st.text_area("Transitions (state, symbol, next_states)", "")
+    nfa_transitions_input = st.text_area("Transitions (state, symbol, next_states) - Use space for lambda transition", "")
 
     if st.button("Convert to DFA"):
         nfa_states = nfa_states_input.strip().split(',')
