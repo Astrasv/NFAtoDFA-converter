@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+import networkx as nx
+import matplotlib.pyplot as plt
+
 
 def set_theme():
     st.markdown(
@@ -39,6 +42,7 @@ def epsilon_closure(states, nfa_transitions):
             if epsilon_state not in epsilon_closure_set:
                 epsilon_closure_set.add(epsilon_state)
                 stack.append(epsilon_state)
+    print(epsilon_closure_set)
     return frozenset(epsilon_closure_set)
 
 def move(states, symbol, nfa_transitions):
@@ -66,10 +70,13 @@ def nfa_to_dfa(nfa_states, alphabet, nfa_transitions, nfa_start_state, nfa_accep
         # Handling empty string transitions
         epsilon_states = epsilon_closure(current_state, nfa_transitions)
         if epsilon_states:
-            dfa_transitions.setdefault(current_state, {}).setdefault('λ', set()).update(epsilon_states)
-            if epsilon_states not in dfa_states:
-                dfa_states.add(epsilon_states)
-                stack.append(epsilon_states)
+            current_transitions = dfa_transitions.setdefault(current_state, {}).setdefault('λ', frozenset())
+            dfa_transitions[current_state]['λ'] = frozenset(current_transitions.union(epsilon_states))
+            if frozenset(epsilon_states) not in dfa_states:
+                dfa_states.add(frozenset(epsilon_states))
+                stack.append(frozenset(epsilon_states))
+
+
     dfa_accept_states = {state for state in dfa_states if state.intersection(nfa_accept_states)}
     return dfa_states, dfa_transitions, dfa_start_state, dfa_accept_states
 
@@ -86,7 +93,29 @@ def display_transition_table(transition_table, alphabet):
             else:
                 row.append("φ")  
         df.loc[len(df)] = row
+    transition_dict = df.to_dict('records')
     st.dataframe(df, width=800)
+    return transition_dict
+
+def draw_graph(transitions):
+    st.subheader("DFA Diagram")
+    G = nx.DiGraph()
+
+    for transition in transitions:
+        state = transition['State']
+        G.add_node(state)
+        for symbol, next_state in transition.items():
+            if symbol != 'State':
+                G.add_edge(state, next_state, label=symbol)
+
+    # Plot the graph
+    fig, ax = plt.subplots()
+    pos = nx.spring_layout(G)
+
+    nx.draw(G, pos, with_labels=True, node_size=1000, node_color='#0ef', font_size=10, font_weight='bold', font_color='#000000')
+    edge_labels = {(n1, n2): d['label'] for n1, n2, d in G.edges(data=True)}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+    st.pyplot(fig)
 
 
 
@@ -132,6 +161,8 @@ def conversion_page():
 
         dfa_states, dfa_transitions, dfa_start_state, dfa_accept_states = nfa_to_dfa(nfa_states, alphabet, nfa_transitions, nfa_start_state, nfa_accept_states)
         transition_table = display_transition_table(dfa_transitions, alphabet)
+        draw_graph(transition_table)
+        
 
 
 
@@ -145,6 +176,12 @@ def main():
 
     selection = st.sidebar.radio("Navigate to", list(pages.keys()), index=1)
     pages[selection]()
+
+# Test transition
+# q0, ,q0
+# q0,a,q1
+# q0,b,q2
+# q1,a,q2
 
 if __name__ == "__main__":
     main()
