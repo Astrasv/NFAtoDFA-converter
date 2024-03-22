@@ -24,7 +24,7 @@ Before running the application, ensure that you have the following dependencies 
 1. Clone the repository to your local machine:
 
     ```bash
-    https://github.com/Astrasv/NFAtoDFA-converter.git
+    git clone https://github.com/Astrasv/NFAtoDFA-converter.git
     ```
 
 2. Navigate to the project directory:
